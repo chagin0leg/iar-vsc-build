@@ -4,11 +4,12 @@
 
 import * as Vscode from "vscode";
 import * as path from "path";
-import { CustomConfigurationProvider, getCppToolsApi, Version, CppToolsApi, SourceFileConfiguration, SourceFileConfigurationItem, WorkspaceBrowseConfiguration } from "vscode-cpptools";
+import { CustomConfigurationProvider, Version, CppToolsApi, SourceFileConfiguration, SourceFileConfigurationItem, WorkspaceBrowseConfiguration } from "vscode-cpptools";
 import { LanguageUtils } from "../../utils/utils";
 import { Define } from "./data/define";
 import { logger } from "iar-vsc-common/logger";
 import { IntellisenseInfoService } from "./intellisenseservice";
+import { getCompatibleCppToolsApi } from "./cpptoolsutil";
 
 /**
  * Provides intellisense configurations for an IAR project to cpptools via the cpptools typescript api.
@@ -23,10 +24,10 @@ export class CpptoolsIntellisenseService implements CustomConfigurationProvider 
      * Initializes the configuration provider and registers it with the cpptools api
      */
     public static async init() {
-        const api = await getCppToolsApi(Version.v2);
+        const api = await getCompatibleCppToolsApi(Version.v2);
 
         if (!api) {
-            Vscode.window.showWarningMessage("Cannot connect the IAR extension with the Microsoft CppTools extension. Intellisense may behave incorrectly.");
+            Vscode.window.showWarningMessage("Cannot connect the IAR extension with a C/C++ extension (ms-vscode.cpptools or anysphere.cpptools). Intellisense may behave incorrectly.");
             return;
         }
         if (CpptoolsIntellisenseService._instance) {
